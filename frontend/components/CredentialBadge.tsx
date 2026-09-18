@@ -44,7 +44,7 @@ export function CredentialBadge({ credential, now, className = "" }: CredentialB
             className="absolute left-1/2 top-[9px] -translate-x-1/2 w-[15px] h-[15px] rounded-full bg-background"
             style={{ boxShadow: "inset 0 0 0 2px rgb(0 0 0 / 0.15)" }}
           />
-          <div className="eyebrow text-center" style={{ color: "rgb(255 255 255 / 0.82)" }}>
+          <div className="eyebrow text-center mt-[22px]" style={{ color: "rgb(255 255 255 / 0.82)" }}>
             GenLayer Verified Credential
           </div>
         </div>
@@ -67,7 +67,7 @@ export function CredentialBadge({ credential, now, className = "" }: CredentialB
               {verified ? `@${credential!.github_username}` : "Not yet verified"}
             </div>
             <div className="mt-0.5 text-[0.68rem] font-mono break-all" style={{ color: "var(--badge-foreground-dim)" }}>
-              {verified ? credential!.wallet : "Connect a wallet and verify to see it here"}
+              {verified ? credential!.wallet : "No badge yet"}
             </div>
             <div
               className="mt-2 inline-flex items-center gap-1 rounded-full px-2.5 py-[3px] text-[0.66rem] font-bold"
