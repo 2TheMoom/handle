@@ -1,11 +1,13 @@
 /**
- * GenLayer Logo Component
- * Per Brand Guidelines 2025
+ * Handle Logo Component
+ *
+ * A rounded-square badge outline with a bold "@" inside - literal, since a
+ * GitHub handle is always written as @username.
  *
  * Variants:
- * - "full": Strong Mark + Wordmark (for desktop/larger spaces)
- * - "mark": Strong Mark only (for mobile/compact spaces)
- * - "wordmark": Wordmark only (for specific cases)
+ * - "full": Mark + Wordmark (for desktop/larger spaces)
+ * - "mark": Mark only (for mobile/compact spaces)
+ * - "wordmark": Wordmark only
  */
 
 import React from 'react';
@@ -22,9 +24,9 @@ interface LogoProps {
 }
 
 const sizeMap = {
-  sm: { mark: 'w-5 h-5', text: 'text-base' },
-  md: { mark: 'w-6 h-6', text: 'text-xl' },
-  lg: { mark: 'w-8 h-8', text: 'text-2xl' },
+  sm: { mark: 'w-6 h-6', text: 'text-base' },
+  md: { mark: 'w-8 h-8', text: 'text-xl' },
+  lg: { mark: 'w-10 h-10', text: 'text-2xl' },
 };
 
 export function Logo({
@@ -36,35 +38,29 @@ export function Logo({
   const colorClass = theme === 'dark' ? 'text-foreground' : 'text-background';
   const { mark: markSize, text: textSize } = sizeMap[size];
 
-  // GenLayer Strong Mark (Triangle/Hands symbol)
-  const StrongMark = () => (
-    <svg
-      className={`${markSize} ${colorClass} transition-colors`}
-      viewBox="0 0 97.76 91.93"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-label="GenLayer Logo"
+  const AtMark = () => (
+    <div
+      className={`${markSize} rounded-[28%] border-[1.6px] flex items-center justify-center font-extrabold shrink-0`}
+      style={{ borderColor: 'var(--primary)', color: 'var(--primary)', fontSize: '0.62em', fontFamily: 'var(--font-display)' }}
+      aria-label="Handle Logo"
     >
-      <path
-        fill="currentColor"
-        d="M44.26 32.35L27.72 67.12L43.29 74.9L0 91.93L44.26 0L44.26 32.35ZM53.5 32.35L70.04 67.12L54.47 74.9L97.76 91.93L53.5 0L53.5 32.35ZM48.64 43.78L58.33 62.94L48.64 67.69L39.47 62.92L48.64 43.78Z"
-      />
-    </svg>
+      @
+    </div>
   );
 
-  // Wordmark (using Space Grotesk from layout)
   const Wordmark = () => (
     <span
-      className={`${textSize} font-bold ${colorClass} font-[family-name:var(--font-display)] transition-colors`}
-      style={{ letterSpacing: '-0.02em' }}
+      className={`${textSize} font-extrabold ${colorClass} font-[family-name:var(--font-display)] transition-colors`}
+      style={{ letterSpacing: '-0.01em' }}
     >
-      GenLayer
+      Handle
     </span>
   );
 
   if (variant === 'mark') {
     return (
       <div className={`inline-flex items-center ${className}`}>
-        <StrongMark />
+        <AtMark />
       </div>
     );
   }
@@ -77,16 +73,14 @@ export function Logo({
     );
   }
 
-  // Full logo (default): Strong Mark + Wordmark
   return (
-    <div className={`inline-flex items-center gap-2 ${className}`}>
-      <StrongMark />
+    <div className={`inline-flex items-center gap-2.5 ${className}`}>
+      <AtMark />
       <Wordmark />
     </div>
   );
 }
 
-// Convenience components for common use cases
 export function LogoFull(props: Omit<LogoProps, 'variant'>) {
   return <Logo {...props} variant="full" />;
 }

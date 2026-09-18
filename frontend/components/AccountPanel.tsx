@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { User, LogOut, AlertCircle, ExternalLink } from "lucide-react";
 import { useWallet } from "@/lib/genlayer/wallet";
-import { usePlayerPoints } from "@/lib/hooks/useFootballBets";
-import { success, error, userRejected } from "@/lib/utils/toast";
+import { useHasCredential } from "@/lib/hooks/useHandle";
+import { error, userRejected } from "@/lib/utils/toast";
 import { AddressDisplay } from "./AddressDisplay";
 import { Button } from "./ui/button";
 import {
@@ -31,7 +31,7 @@ export function AccountPanel() {
     switchWalletAccount,
   } = useWallet();
 
-  const { data: points = 0 } = usePlayerPoints(address);
+  const { data: hasCredential } = useHasCredential(address);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [connectionError, setConnectionError] = useState("");
@@ -74,11 +74,9 @@ export function AccountPanel() {
       setIsSwitching(true);
       setConnectionError("");
       await switchWalletAccount();
-      // Keep modal open to show new account info
     } catch (err: any) {
       console.error("Failed to switch account:", err);
 
-      // Don't show error if user cancelled
       if (!err.message?.includes("rejected")) {
         setConnectionError(err.message || "Failed to switch account");
         error("Failed to switch account", {
@@ -92,7 +90,6 @@ export function AccountPanel() {
     }
   };
 
-  // Not connected state
   if (!isConnected) {
     return (
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -102,13 +99,13 @@ export function AccountPanel() {
             Connect Wallet
           </Button>
         </DialogTrigger>
-        <DialogContent className="brand-card border-2">
+        <DialogContent className="bg-card border-border">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold">
               Connect to GenLayer
             </DialogTitle>
             <DialogDescription>
-              Connect your MetaMask wallet to start betting
+              Connect your MetaMask wallet to get your own badge
             </DialogDescription>
           </DialogHeader>
 
@@ -133,7 +130,7 @@ export function AccountPanel() {
                   Install MetaMask
                 </Button>
 
-                <div className="p-4 rounded-lg bg-muted/10 border border-muted/20">
+                <div className="p-4 rounded-lg bg-muted/40 border border-border">
                   <p className="text-xs text-muted-foreground">
                     After installing MetaMask, refresh this page and click
                     &quot;Connect Wallet&quot; again.
@@ -160,7 +157,7 @@ export function AccountPanel() {
                   </Alert>
                 )}
 
-                <div className="p-4 rounded-lg bg-muted/10 border border-muted/20">
+                <div className="p-4 rounded-lg bg-muted/40 border border-border">
                   <p className="text-xs text-muted-foreground">
                     This will open MetaMask and prompt you to:
                   </p>
@@ -178,30 +175,24 @@ export function AccountPanel() {
     );
   }
 
-  // Connected state
   return (
     <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-      <div className="flex items-center gap-4">
-        <div className="brand-card px-4 py-2 flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <User className="w-4 h-4 text-accent" />
+      <DialogTrigger asChild>
+        <button className="bg-card border border-border rounded-full px-3 py-1.5 flex items-center gap-2.5 hover:border-primary/50 transition-colors">
+          <span
+            className={`w-4 h-4 rounded-full border-[1.5px] flex items-center justify-center text-[9px] leading-none shrink-0 ${
+              hasCredential ? "border-success text-success" : "border-border text-muted-foreground"
+            }`}
+          >
+            {hasCredential ? "✓" : "?"}
+          </span>
+          <span className="font-mono text-xs">
             <AddressDisplay address={address} maxLength={12} />
-          </div>
-          <div className="h-4 w-px bg-white/10" />
-          <div className="flex items-center gap-1">
-            <span className="text-sm font-semibold text-accent">{points}</span>
-            <span className="text-xs text-muted-foreground">pts</span>
-          </div>
-        </div>
+          </span>
+        </button>
+      </DialogTrigger>
 
-        <DialogTrigger asChild>
-          <Button variant="outline" size="sm">
-            <User className="w-4 h-4" />
-          </Button>
-        </DialogTrigger>
-      </div>
-
-      <DialogContent className="brand-card border-2">
+      <DialogContent className="bg-card border-border">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">
             Wallet Details
@@ -212,23 +203,29 @@ export function AccountPanel() {
         </DialogHeader>
 
         <div className="space-y-4 mt-4">
-          <div className="brand-card p-4 space-y-2">
+          <div className="rounded-lg border border-border bg-muted/40 p-4 space-y-2">
             <p className="text-sm text-muted-foreground">Your Address</p>
             <code className="text-sm font-mono break-all">{address}</code>
           </div>
 
-          <div className="brand-card p-4 space-y-2">
-            <p className="text-sm text-muted-foreground">Your Points</p>
-            <p className="text-2xl font-bold text-accent">{points}</p>
+          <div className="rounded-lg border border-border bg-muted/40 p-4 space-y-2">
+            <p className="text-sm text-muted-foreground">Handle Badge</p>
+            <p className="text-sm">
+              {hasCredential ? (
+                <span className="text-success font-semibold">✓ Verified</span>
+              ) : (
+                <span className="text-muted-foreground">Not yet verified</span>
+              )}
+            </p>
           </div>
 
-          <div className="brand-card p-4 space-y-2">
+          <div className="rounded-lg border border-border bg-muted/40 p-4 space-y-2">
             <p className="text-sm text-muted-foreground">Network Status</p>
             <div className="flex items-center gap-2">
               <div
                 className={`w-2 h-2 rounded-full ${
                   isOnCorrectNetwork
-                    ? "bg-green-500"
+                    ? "bg-success"
                     : "bg-yellow-500 animate-pulse"
                 }`}
               />
@@ -259,7 +256,7 @@ export function AccountPanel() {
             </Alert>
           )}
 
-          <div className="mt-6 pt-4 border-t border-white/10 space-y-3">
+          <div className="mt-6 pt-4 border-t border-border space-y-3">
             <Button
               onClick={handleSwitchAccount}
               variant="outline"
@@ -281,7 +278,7 @@ export function AccountPanel() {
             </Button>
           </div>
 
-          <div className="p-4 rounded-lg bg-muted/10 border border-muted/20">
+          <div className="p-4 rounded-lg bg-muted/40 border border-border">
             <p className="text-xs text-muted-foreground">
               Use &quot;Switch Account&quot; to select a different MetaMask
               account. Use &quot;Disconnect&quot; to remove this site from
